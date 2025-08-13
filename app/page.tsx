@@ -1,103 +1,180 @@
-import Image from "next/image";
+'use client';
+import React, { useState, useRef, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+//import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Ensure Bootstrap JS is loaded
+
+const images = [
+  {
+    src: "https://media.geeksforgeeks.org/wp-content/uploads/20211213172224/1.png",
+    alt: "One Image",
+    captionTitle: "One Image",
+    captionText: "Image 1 from GeeksforGeeks without 403 Error Protection"
+  },
+  {
+    src: "https://media.geeksforgeeks.org/wp-content/uploads/20211213172225/2.png",
+    alt: "Two Image",
+    captionTitle: "Two Image",
+    captionText: "Image 2 from GeeksforGeeks without 403 Error Protection"
+  },
+  {
+    src: "https://media.geeksforgeeks.org/wp-content/uploads/20211213172226/3.png",
+    alt: "Image 3",
+    captionTitle: "Image 3",
+    captionText: "Image 3 from GeeksforGeeks without 403 Error Protection"
+  }
+];
 
 export default function Home() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+
+
+
+  // Handle the previous slide using the carousel API from Bootstrap
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
+  };
+
+  // Handle the next slide using the carousel API from Bootstrap
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
+  };
+
+  // Handle dot click to change the slide
+  const handleDotClick = (index: number) => {
+    setCurrentIndex(index);
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
+    <div className="container" style={{ backgroundColor: "black", padding: "0" }}>
+      <br />
+      <div
+        id="myCarousel"
+        className="carousel slide"
+        data-bs-ride="carousel"
+        ref={carouselRef}
+        style={{ position: "relative" }}
+      >
+        {/* Indicators (Dots) */}
+        <ol className="carousel-indicators">
+          {images.map((_, index) => (
+            <li
+              key={index}
+              data-bs-target="#myCarousel"
+              data-bs-slide-to={index}
+              className={index === currentIndex ? "active" : ""}
+              onClick={() => handleDotClick(index)}
+              style={{
+                backgroundColor: index === currentIndex ? "#007bff" : "#bbb",
+                borderRadius: "50%",
+                width: "15px",
+                height: "15px",
+                margin: "0 5px",
+                cursor: "pointer"
+              }}
+            ></li>
+          ))}
         </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* Wrapper for slides */}
+        <div className="carousel-inner" role="listbox">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className={`carousel-item ${index === currentIndex ? "active" : ""}`}
+            >
+              <img
+                src={image.src}
+                alt={image.alt}
+                width="200"
+                height="300"
+                className="d-block w-70 mx-auto"
+              />
+              <div className="carousel-caption" style={{ color: "white" }}>
+                <h3>{image.captionTitle}</h3>
+                <p>{image.captionText}</p>
+              </div>
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+
+        {/* Left (Prev) and Right (Next) Controls */}
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          className="carousel-control-prev"
+          href="#myCarousel"
+          role="button"
+          data-bs-slide="prev"
+          onClick={(e) => {
+            e.preventDefault();
+            prevSlide();
+          }}
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "0",
+            transform: "translateY(-50%)",
+            zIndex: 10,
+            backgroundColor: "black",
+            borderRadius: "50%",
+            padding: "10px",
+            color: "white",
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
+          <span
+            className="carousel-control-prev-icon"
+            aria-hidden="true"
+            style={{
+              backgroundColor: "white",
+              borderRadius: "50%",
+              width: "30px",
+              height: "30px",
+             // backgroundImage: "url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22%23fff%22 viewBox=%220 0 24 24%22 width=%2224%22 height=%2224%22%3E%3Cpath d=%22M14.59 16.59L9.17 12l5.42-4.59L13.17 6l-7 6 7 6z%22/%3E%3C/svg%3E')",
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          ></span>
+          <span className="sr-only">Previous</span>
         </a>
+
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          className="carousel-control-next"
+          href="#myCarousel"
+          role="button"
+          data-bs-slide="next"
+          onClick={(e) => {
+            e.preventDefault();
+            nextSlide();
+          }}
+          style={{
+            position: "absolute",
+            top: "50%",
+            right: "0",
+            transform: "translateY(-50%)",
+            zIndex: 10,
+            backgroundColor: "black",
+            borderRadius: "50%",
+            padding: "10px",
+            color: "white",
+          }}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
+          <span
+            className="carousel-control-next-icon"
+            aria-hidden="true"
+            style={{
+              backgroundColor: "white",
+              borderRadius: "50%",
+              width: "30px",
+              height: "30px",
+              backgroundImage: "url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22%23fff%22 viewBox=%220 0 24 24%22 width=%2224%22 height=%2224%22%3E%3Cpath d=%22M9.41 7.41L14.83 12l-5.42 4.59L10.83 18l7-6-7-6z%22/%3E%3C/svg%3E')",
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          ></span>
+          <span className="sr-only">Next</span>
         </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
